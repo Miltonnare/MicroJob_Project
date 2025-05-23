@@ -1,0 +1,226 @@
+
+:root {
+  
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+ 
+  --primary-color: #2e7d32; 
+  --accent-color: #d32f2f; 
+  --background-color: #f5f5f5; 
+  --text-color: #212121;
+  --card-bg: #ffffff; 
+  --navbar-bg: #2e7d32;
+
+  
+  color: var(--text-color);
+  background-color: var(--background-color);
+
+  /* Optimize rendering for performance */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark mode support for user preference or battery saving */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #263238; 
+    --text-color: #eceff1;
+    --card-bg: #37474f; 
+    --navbar-bg: #1b5e20;
+  }
+}
+
+/* Reset default margins and ensure full viewport coverage */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; 
+}
+
+/* Container for main content, ensuring padding and max-width */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Navbar customizations (Bootstrap override) */
+.navbar {
+  background-color: var(--navbar-bg) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  padding: 0.75rem 1rem; 
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff !important;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+  border-radius: 4px;
+}
+
+.navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.5); /* Match navbar theme */
+}
+
+/* Links for consistent styling */
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  color: darken(var(--accent-color), 10%); /* Slightly darker red */
+}
+
+/* Headings for hierarchy */
+h1 {
+  font-size: 2.5rem; 
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: blueviolet;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+
+button, .btn {
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: darken(var(--primary-color), 10%);
+  border-color: darken(var(--primary-color), 10%);
+}
+
+.btn-secondary {
+  background-color: #616161; 
+  border-color: #616161;
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: darken(#616161, 10%);
+}
+
+
+.card {
+  background-color: var(--card-bg);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+  transition: transform 0.2s;
+  margin-bottom: 1rem;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card h6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.card p {
+  margin: 0;
+  color: #616161; /* Softer text for details */
+}
+
+.progress {
+  height: 0.75rem;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+}
+
+.progress-bar {
+  background-color: var(--accent-color);
+}
+
+/* List group for courses */
+.list-group-item {
+  background-color: var(--card-bg);
+  border-color: rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1.25rem;
+}
+
+/* Forms for search and profile */
+.form-control {
+  border-radius: 6px;
+  border: 1px solid #bdbdbd;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25); /* Green focus ring */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 1.75rem;
+  }
+  .container {
+    padding: 1rem;
+  }
+  .card {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Accessibility: High contrast for low vision */
+@media (prefers-contrast: high) {
+  :root {
+    --text-color: #000000;
+    --background-color: #ffffff;
+    --card-bg: #ffffff;
+  }
+  .btn-primary {
+    background-color: #1b5e20; /* Darker green */
+  }
+}
