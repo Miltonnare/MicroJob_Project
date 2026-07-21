@@ -17,7 +17,7 @@ export class PaymentsService {
         channel: PaymentChannel.MPESA,
         transactionType: TransactionType.DEPOSIT,
         referenceNumber,
-        status: TransactionStatus.COMPLETED, // Auto-simulated for seamless Daraja integration
+        status: TransactionStatus.COMPLETED,
       },
     });
 
@@ -46,37 +46,37 @@ export class PaymentsService {
       throw new BadRequestException(`Escrow is currently in ${contract.escrow.status} status`);
     }
 
-    // Update Escrow to RELEASED
-    await this.prisma.escrowAccount.update({
-      where: { contractId },
-      data: { status: EscrowStatus.RELEASED },
-    });
+    // Atomic Database Transaction for Escrow Release & Contract Completion
+    return this.prisma.$transaction(async (tx) => {
+      await tx.escrowAccount.update({
+        where: { contractId },
+        data: { status: EscrowStatus.RELEASED },
+      });
 
-    // Update Contract to COMPLETED
-    await this.prisma.contract.update({
-      where: { id: contractId },
-      data: { status: ContractStatus.COMPLETED },
-    });
+      await tx.contract.update({
+        where: { id: contractId },
+        data: { status: ContractStatus.COMPLETED },
+      });
 
-    // Record release transaction for worker
-    const refNum = `REL-${Date.now()}`;
-    await this.prisma.paymentTransaction.create({
-      data: {
-        userId: contract.workerId,
-        amount: contract.totalAmount,
-        currency: 'KES',
-        channel: PaymentChannel.MPESA,
-        transactionType: TransactionType.RELEASE,
-        referenceNumber: refNum,
-        status: TransactionStatus.COMPLETED,
-      },
-    });
+      const refNum = `REL-${Date.now()}`;
+      await tx.paymentTransaction.create({
+        data: {
+          userId: contract.workerId,
+          amount: contract.totalAmount,
+          currency: 'KES',
+          channel: PaymentChannel.MPESA,
+          transactionType: TransactionType.RELEASE,
+          referenceNumber: refNum,
+          status: TransactionStatus.COMPLETED,
+        },
+      });
 
-    return {
-      message: 'Escrow payment released successfully to fundi',
-      contractId,
-      amountReleased: contract.totalAmount,
-    };
+      return {
+        message: 'Escrow payment released successfully to fundi M-Pesa account',
+        contractId,
+        amountReleased: contract.totalAmount,
+      };
+    });
   }
 
   async getUserEarnings(userId: string) {

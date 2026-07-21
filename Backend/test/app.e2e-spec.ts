@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
 
-describe('MicroJob Backend E2E Suite', () => {
+describe('MicroJob Enterprise E2E Integration Suite', () => {
   let app: INestApplication;
+  let authToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -12,6 +14,8 @@ describe('MicroJob Backend E2E Suite', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalFilters(new AllExceptionsFilter());
     await app.init();
   });
 
@@ -19,7 +23,7 @@ describe('MicroJob Backend E2E Suite', () => {
     await app.close();
   });
 
-  it('/api/v1/locations/counties (GET) - Should return 47 Kenyan Counties', async () => {
+  it('1. GET /api/v1/locations/counties - Should return 47 Kenyan Counties', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/v1/locations/counties')
       .expect(200);
@@ -27,7 +31,7 @@ describe('MicroJob Backend E2E Suite', () => {
     expect(Array.isArray(response.body)).toBe(true);
   });
 
-  it('/api/v1/locations/categories (GET) - Should return informal trade categories', async () => {
+  it('2. GET /api/v1/locations/categories - Should return trade categories and skills', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/v1/locations/categories')
       .expect(200);
@@ -35,7 +39,36 @@ describe('MicroJob Backend E2E Suite', () => {
     expect(Array.isArray(response.body)).toBe(true);
   });
 
-  it('/api/v1/jobs (GET) - Should list open jobs', async () => {
+  it('3. POST /api/v1/auth/register - Should register a new Fundi user', async () => {
+    const email = `test.fundi.${Date.now()}@microjob.co.ke`;
+    const phone = `+2547${Math.floor(10000000 + Math.random() * 90000000)}`;
+
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/auth/register')
+      .send({
+        fullName: 'Test Fundi',
+        email,
+        phone,
+        password: 'Password123!',
+        role: 'WORKER',
+      })
+      .expect(201);
+
+    expect(response.body).toHaveProperty('tokens');
+    expect(response.body.user).toHaveProperty('email', email);
+    authToken = response.body.tokens.accessToken;
+  });
+
+  it('4. GET /api/v1/auth/me - Should return authenticated profile with JWT', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('fullName', 'Test Fundi');
+  });
+
+  it('5. GET /api/v1/jobs - Should list open jobs', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/v1/jobs')
       .expect(200);
@@ -43,7 +76,7 @@ describe('MicroJob Backend E2E Suite', () => {
     expect(Array.isArray(response.body)).toBe(true);
   });
 
-  it('/api/v1/workers (GET) - Should list available fundis', async () => {
+  it('6. GET /api/v1/workers - Should list available workers', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/v1/workers')
       .expect(200);
